@@ -39,3 +39,19 @@ To update an existing installation:
 5. Open it again from the Home Screen.
 
 The service-worker cache version has been changed so the new shell replaces the old one.
+
+
+FULL-SCREEN COVER FIX V3
+This version no longer uses the reduced iPhone visual viewport as the app height.
+In Home Screen mode, it uses the full screen height and extends the iframe slightly
+past the bottom edge so the HTML Pocket blue shell cannot show through.
+
+UPDATE STEPS
+1. Replace every file in the existing GitHub Pages repository with this ZIP's files.
+2. Wait for GitHub Pages to finish publishing.
+3. Open the published site once in Safari.
+4. Open HTML Pocket from the Home Screen.
+5. Fully close HTML Pocket from the app switcher and reopen it.
+
+If the old version remains cached, remove the Home Screen icon and add it again
+from the newly published Safari page.
