@@ -22,12 +22,68 @@
       --safe-right: max(12px, env(safe-area-inset-right));
       --safe-bottom: max(12px, env(safe-area-inset-bottom));
       --safe-left: max(12px, env(safe-area-inset-left));
+      --pocket-height: 100dvh;
+      --pocket-top: 0px;
     }
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    html, body { width:100%; height:100%; margin:0; overflow:hidden; background:#6da8f4; font-family:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Rounded","Segoe UI",sans-serif; -webkit-font-smoothing:antialiased; }
+    html {
+      width:100%;
+      min-height:100%;
+      height:100dvh;
+      margin:0;
+      overflow:hidden;
+      background:#6da8f4;
+      overscroll-behavior:none;
+    }
+
+    body {
+      position:fixed;
+      top:var(--pocket-top);
+      right:0;
+      bottom:auto;
+      left:0;
+      width:100%;
+      height:var(--pocket-height);
+      min-height:0;
+      margin:0;
+      overflow:hidden;
+      background:#6da8f4;
+      overscroll-behavior:none;
+      touch-action:manipulation;
+      font-family:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Rounded","Segoe UI",sans-serif;
+      -webkit-font-smoothing:antialiased;
+    }
+
     button { font:inherit; }
-    .shell { position:fixed; inset:0; overflow:hidden; background:radial-gradient(circle at 14% -4%,rgba(255,255,255,.48),transparent 26%),linear-gradient(180deg,#7db5ff,#d8eeff); }
-    .viewer { position:absolute; inset:0; width:100%; height:100%; border:0; background:#fff; }
+
+    .shell {
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      min-height:0;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 14% -4%,rgba(255,255,255,.48),transparent 26%),
+        linear-gradient(180deg,#7db5ff,#d8eeff);
+      contain:layout size;
+    }
+
+    .viewer {
+      position:absolute;
+      top:0;
+      right:0;
+      bottom:0;
+      left:0;
+      display:block;
+      width:100%;
+      height:100%;
+      min-height:0;
+      border:0;
+      margin:0;
+      padding:0;
+      background:#fff;
+    }
     .loader { position:absolute; inset:0; z-index:4; display:grid; place-items:center; padding:24px; color:var(--ink); background:radial-gradient(circle at 15% -5%,rgba(255,255,255,.60),transparent 26%),linear-gradient(180deg,#7db5ff,#d8eeff); text-align:center; transition:opacity .25s ease,visibility .25s ease; }
     .loader.hidden { opacity:0; visibility:hidden; pointer-events:none; }
     .penguin { position:relative; width:102px; height:116px; margin:0 auto 14px; border-radius:52% 52% 46% 46%; background:#183051; box-shadow:0 18px 36px rgba(37,77,128,.18); }
@@ -54,6 +110,11 @@
     .note { margin:13px 2px 0; color:rgba(32,52,84,.62); font-size:.72rem; line-height:1.5; text-align:center; }
     .toast { position:absolute; z-index:12; right:var(--safe-right); bottom:calc(var(--safe-bottom) + 12px); left:var(--safe-left); width:fit-content; max-width:min(420px,calc(100% - var(--safe-left) - var(--safe-right))); margin:0 auto; padding:12px 16px; border:1px solid rgba(255,255,255,.65); border-radius:999px; color:var(--ink); background:rgba(255,255,255,.88); box-shadow:var(--shadow); font-size:.82rem; font-weight:800; text-align:center; opacity:0; transform:translateY(12px); pointer-events:none; transition:opacity .2s ease,transform .2s ease; }
     .toast.show { opacity:1; transform:translateY(0); } input[type=file] { display:none; }
+    @supports not (height: 100dvh) {
+      :root { --pocket-height: 100vh; }
+      html { height:100vh; }
+    }
+
     @media(max-width:430px){ .actions{grid-template-columns:1fr}.action.wide{grid-column:auto} }
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;transition-duration:1ms!important}}
   </style>
@@ -69,6 +130,40 @@
   </main>
   <script>
     (()=>{"use strict";
+
+      function syncPocketViewport() {
+        const viewport = window.visualViewport;
+        const height = viewport ? viewport.height : window.innerHeight;
+        const top = viewport ? viewport.offsetTop : 0;
+
+        document.documentElement.style.setProperty(
+          "--pocket-height",
+          `${Math.ceil(height)}px`
+        );
+        document.documentElement.style.setProperty(
+          "--pocket-top",
+          `${Math.max(0, Math.floor(top))}px`
+        );
+      }
+
+      syncPocketViewport();
+      window.addEventListener("resize", syncPocketViewport, { passive: true });
+      window.addEventListener("orientationchange", () => {
+        window.setTimeout(syncPocketViewport, 80);
+        window.setTimeout(syncPocketViewport, 320);
+      }, { passive: true });
+
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", syncPocketViewport, { passive: true });
+        window.visualViewport.addEventListener("scroll", syncPocketViewport, { passive: true });
+      }
+
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden) {
+          window.setTimeout(syncPocketViewport, 50);
+        }
+      });
+
       const DB_NAME="html-pocket-db",DB_VERSION=1,STORE_NAME="apps",CURRENT_KEY="current",DEFAULT_URL="./default-app.html",DEFAULT_NAME="Pip’s Baccarat";
       const viewer=document.getElementById("viewer"),loader=document.getElementById("loader"),menuButton=document.getElementById("menuButton"),backdrop=document.getElementById("backdrop"),closeButton=document.getElementById("closeButton"),currentName=document.getElementById("currentName"),fileInput=document.getElementById("fileInput"),reloadButton=document.getElementById("reloadButton"),resetButton=document.getElementById("resetButton"),toast=document.getElementById("toast");
       let activeApp=null,toastTimer=0;
@@ -78,10 +173,22 @@
       function showToast(message){clearTimeout(toastTimer);toast.textContent=message;toast.classList.add("show");toastTimer=setTimeout(()=>toast.classList.remove("show"),2200)}
       function setMenu(open){backdrop.classList.toggle("open",open)}
       function validateHTML(text){const value=text.trim().toLowerCase();return value.includes("<html")||value.startsWith("<!doctype html")||value.includes("<body")}
-      function displayApp(app){activeApp=app;currentName.textContent=app.name;loader.classList.remove("hidden");viewer.srcdoc=app.html}
+      function displayApp(app){
+        activeApp=app;
+        currentName.textContent=app.name;
+        loader.classList.remove("hidden");
+        syncPocketViewport();
+        viewer.srcdoc=app.html;
+      }
       async function loadDefault({save=true}={}){const response=await fetch(DEFAULT_URL,{cache:"no-store"});if(!response.ok)throw new Error("Could not load default app");const app={name:DEFAULT_NAME,html:await response.text(),updatedAt:Date.now()};if(save)await saveApp(app);displayApp(app)}
       async function initialize(){try{const saved=await readSavedApp();saved&&typeof saved.html==="string"?displayApp(saved):await loadDefault()}catch(error){console.error(error);await loadDefault({save:false})}}
-      viewer.addEventListener("load",()=>setTimeout(()=>loader.classList.add("hidden"),180));
+      viewer.addEventListener("load",()=>{
+        syncPocketViewport();
+        setTimeout(()=>{
+          syncPocketViewport();
+          loader.classList.add("hidden");
+        },180);
+      });
       menuButton.addEventListener("click",()=>setMenu(true));closeButton.addEventListener("click",()=>setMenu(false));backdrop.addEventListener("click",e=>{if(e.target===backdrop)setMenu(false)});
       reloadButton.addEventListener("click",()=>{if(!activeApp)return;setMenu(false);displayApp(activeApp);showToast("Reloaded")});
       resetButton.addEventListener("click",async()=>{setMenu(false);try{await loadDefault();showToast("Pip’s Baccarat restored")}catch(error){console.error(error);showToast("Could not restore the default app")}});

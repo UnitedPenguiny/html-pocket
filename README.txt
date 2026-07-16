@@ -26,3 +26,16 @@ USING FUTURE HTML FILES
 5. HTML Pocket remembers it automatically.
 
 Only import self-contained HTML files you trust.
+
+
+IPHONE VIEWPORT FIX
+This build fixes a blue strip / cut-off area at the bottom of the installed Home Screen app.
+
+To update an existing installation:
+1. Replace the files in the same GitHub Pages repository with this build.
+2. Wait for GitHub Pages to finish deploying.
+3. Open HTML Pocket once while online.
+4. Fully close it from the iPhone app switcher.
+5. Open it again from the Home Screen.
+
+The service-worker cache version has been changed so the new shell replaces the old one.
