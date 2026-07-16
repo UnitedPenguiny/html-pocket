@@ -55,3 +55,23 @@ UPDATE STEPS
 
 If the old version remains cached, remove the Home Screen icon and add it again
 from the newly published Safari page.
+
+
+NO-IFRAME IPHONE FIX
+The exact uploaded project still used an iframe to display imported HTML.
+iPhone Home Screen mode can reserve the bottom safe area outside an iframe,
+which caused the solid blue strip.
+
+This build removes the iframe completely:
+- imported HTML becomes the real top-level page
+- the three-dot HTML Pocket menu is injected into that page
+- the same IndexedDB data is reused, so the currently selected app is preserved
+- localStorage in imported apps continues to use the same website origin
+- offline support and the Home Screen icon remain
+
+UPDATE
+1. Replace the repository files with this build.
+2. Wait for GitHub Pages deployment.
+3. Open the website once in Safari while online.
+4. Fully close HTML Pocket and reopen it.
+5. If iOS keeps the old shell, remove the Home Screen icon and add it again.
