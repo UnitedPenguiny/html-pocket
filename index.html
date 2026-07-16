@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#6da8f4" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="HTML Pocket" />
+  <meta name="format-detection" content="telephone=no" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <title>HTML Pocket</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #203454;
+      --panel: rgba(255,255,255,.88);
+      --border: rgba(255,255,255,.72);
+      --shadow: 0 18px 42px rgba(25,58,105,.24);
+      --safe-top: max(12px, env(safe-area-inset-top));
+      --safe-right: max(12px, env(safe-area-inset-right));
+      --safe-bottom: max(12px, env(safe-area-inset-bottom));
+      --safe-left: max(12px, env(safe-area-inset-left));
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html, body { width:100%; height:100%; margin:0; overflow:hidden; background:#6da8f4; font-family:Inter,-apple-system,BlinkMacSystemFont,"SF Pro Rounded","Segoe UI",sans-serif; -webkit-font-smoothing:antialiased; }
+    button { font:inherit; }
+    .shell { position:fixed; inset:0; overflow:hidden; background:radial-gradient(circle at 14% -4%,rgba(255,255,255,.48),transparent 26%),linear-gradient(180deg,#7db5ff,#d8eeff); }
+    .viewer { position:absolute; inset:0; width:100%; height:100%; border:0; background:#fff; }
+    .loader { position:absolute; inset:0; z-index:4; display:grid; place-items:center; padding:24px; color:var(--ink); background:radial-gradient(circle at 15% -5%,rgba(255,255,255,.60),transparent 26%),linear-gradient(180deg,#7db5ff,#d8eeff); text-align:center; transition:opacity .25s ease,visibility .25s ease; }
+    .loader.hidden { opacity:0; visibility:hidden; pointer-events:none; }
+    .penguin { position:relative; width:102px; height:116px; margin:0 auto 14px; border-radius:52% 52% 46% 46%; background:#183051; box-shadow:0 18px 36px rgba(37,77,128,.18); }
+    .penguin::before { content:""; position:absolute; left:19px; right:19px; bottom:15px; height:65px; border-radius:48%; background:#fff; }
+    .eye { position:absolute; top:26px; width:23px; height:27px; border-radius:50%; background:#fff; }
+    .eye.left { left:23px; } .eye.right { right:23px; }
+    .eye::after { content:""; position:absolute; top:3px; right:2px; width:15px; height:15px; border-radius:50%; background:#152641; box-shadow:inset -3px -3px 0 rgba(255,255,255,.18); }
+    .beak { position:absolute; top:49px; left:50%; width:0; height:0; transform:translateX(-50%); border-top:9px solid transparent; border-bottom:9px solid transparent; border-left:17px solid #ffbf87; }
+    .loader strong { display:block; margin-bottom:5px; font-size:1.18rem; }
+    .loader span { color:rgba(32,52,84,.68); font-size:.86rem; }
+    .menu-button { position:absolute; z-index:8; top:var(--safe-top); right:var(--safe-right); display:grid; width:48px; height:48px; place-items:center; border:1px solid var(--border); border-radius:17px; color:var(--ink); background:rgba(255,255,255,.78); box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.8); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); cursor:pointer; transition:transform .16s ease; }
+    .menu-button:active { transform:scale(.95); } .menu-button svg { width:23px; height:23px; }
+    .sheet-backdrop { position:absolute; inset:0; z-index:9; background:rgba(17,34,59,.28); opacity:0; visibility:hidden; transition:opacity .22s ease,visibility .22s ease; }
+    .sheet-backdrop.open { opacity:1; visibility:visible; }
+    .sheet { position:absolute; z-index:10; right:var(--safe-right); bottom:var(--safe-bottom); left:var(--safe-left); max-width:520px; margin:0 auto; padding:18px; border:1px solid var(--border); border-radius:28px; color:var(--ink); background:var(--panel); box-shadow:0 26px 70px rgba(20,48,91,.30),inset 0 1px 0 rgba(255,255,255,.86); backdrop-filter:blur(22px) saturate(140%); -webkit-backdrop-filter:blur(22px) saturate(140%); transform:translateY(calc(100% + 40px)); transition:transform .30s cubic-bezier(.2,.8,.2,1); }
+    .sheet-backdrop.open .sheet { transform:translateY(0); }
+    .sheet-head { display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:14px; }
+    .sheet-title { min-width:0; } .sheet-title small { display:block; margin-bottom:4px; color:rgba(32,52,84,.58); font-size:.68rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+    .sheet-title strong { display:block; overflow:hidden; font-size:1rem; text-overflow:ellipsis; white-space:nowrap; }
+    .close { display:grid; width:38px; height:38px; flex:0 0 auto; place-items:center; border:0; border-radius:14px; color:var(--ink); background:rgba(72,108,160,.10); cursor:pointer; }
+    .actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .action { min-height:54px; padding:0 14px; border:1px solid rgba(83,124,180,.16); border-radius:17px; color:var(--ink); background:rgba(255,255,255,.62); font-weight:800; cursor:pointer; box-shadow:inset 0 1px 0 rgba(255,255,255,.78); }
+    .action.primary { background:linear-gradient(180deg,#ffe7ad,#ffc977); color:#704509; } .action.wide { grid-column:1/-1; }
+    .note { margin:13px 2px 0; color:rgba(32,52,84,.62); font-size:.72rem; line-height:1.5; text-align:center; }
+    .toast { position:absolute; z-index:12; right:var(--safe-right); bottom:calc(var(--safe-bottom) + 12px); left:var(--safe-left); width:fit-content; max-width:min(420px,calc(100% - var(--safe-left) - var(--safe-right))); margin:0 auto; padding:12px 16px; border:1px solid rgba(255,255,255,.65); border-radius:999px; color:var(--ink); background:rgba(255,255,255,.88); box-shadow:var(--shadow); font-size:.82rem; font-weight:800; text-align:center; opacity:0; transform:translateY(12px); pointer-events:none; transition:opacity .2s ease,transform .2s ease; }
+    .toast.show { opacity:1; transform:translateY(0); } input[type=file] { display:none; }
+    @media(max-width:430px){ .actions{grid-template-columns:1fr}.action.wide{grid-column:auto} }
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;transition-duration:1ms!important}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <iframe class="viewer" id="viewer" title="Imported HTML app" sandbox="allow-scripts allow-same-origin allow-forms allow-modals allow-popups allow-downloads allow-pointer-lock" allow="autoplay; clipboard-read; clipboard-write; fullscreen; gamepad; accelerometer; gyroscope"></iframe>
+    <div class="loader" id="loader"><div><div class="penguin" aria-hidden="true"><span class="eye left"></span><span class="eye right"></span><span class="beak"></span></div><strong>Opening your app</strong><span>HTML Pocket remembers it for next time.</span></div></div>
+    <button class="menu-button" id="menuButton" type="button" aria-label="Open HTML Pocket menu"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/></svg></button>
+    <div class="sheet-backdrop" id="backdrop"><section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetHeading"><div class="sheet-head"><div class="sheet-title"><small id="sheetHeading">Current HTML</small><strong id="currentName">Pip’s Baccarat</strong></div><button class="close" id="closeButton" type="button" aria-label="Close menu">×</button></div><div class="actions"><label class="action primary" for="fileInput" style="display:grid;place-items:center;text-align:center;">Import HTML</label><button class="action" id="reloadButton" type="button">Reload</button><button class="action wide" id="resetButton" type="button">Restore Pip’s Baccarat</button></div><p class="note">Only import self-contained HTML files you trust. Your selected app is saved on this device.</p></section></div>
+    <input id="fileInput" type="file" accept=".html,text/html" />
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </main>
+  <script>
+    (()=>{"use strict";
+      const DB_NAME="html-pocket-db",DB_VERSION=1,STORE_NAME="apps",CURRENT_KEY="current",DEFAULT_URL="./default-app.html",DEFAULT_NAME="Pip’s Baccarat";
+      const viewer=document.getElementById("viewer"),loader=document.getElementById("loader"),menuButton=document.getElementById("menuButton"),backdrop=document.getElementById("backdrop"),closeButton=document.getElementById("closeButton"),currentName=document.getElementById("currentName"),fileInput=document.getElementById("fileInput"),reloadButton=document.getElementById("reloadButton"),resetButton=document.getElementById("resetButton"),toast=document.getElementById("toast");
+      let activeApp=null,toastTimer=0;
+      const openDatabase=()=>new Promise((resolve,reject)=>{const request=indexedDB.open(DB_NAME,DB_VERSION);request.onupgradeneeded=()=>{const db=request.result;if(!db.objectStoreNames.contains(STORE_NAME))db.createObjectStore(STORE_NAME)};request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error)});
+      const readSavedApp=async()=>{const db=await openDatabase();return new Promise((resolve,reject)=>{const t=db.transaction(STORE_NAME,"readonly"),r=t.objectStore(STORE_NAME).get(CURRENT_KEY);r.onsuccess=()=>resolve(r.result||null);r.onerror=()=>reject(r.error)})};
+      const saveApp=async(app)=>{const db=await openDatabase();return new Promise((resolve,reject)=>{const t=db.transaction(STORE_NAME,"readwrite");t.objectStore(STORE_NAME).put(app,CURRENT_KEY);t.oncomplete=resolve;t.onerror=()=>reject(t.error)})};
+      function showToast(message){clearTimeout(toastTimer);toast.textContent=message;toast.classList.add("show");toastTimer=setTimeout(()=>toast.classList.remove("show"),2200)}
+      function setMenu(open){backdrop.classList.toggle("open",open)}
+      function validateHTML(text){const value=text.trim().toLowerCase();return value.includes("<html")||value.startsWith("<!doctype html")||value.includes("<body")}
+      function displayApp(app){activeApp=app;currentName.textContent=app.name;loader.classList.remove("hidden");viewer.srcdoc=app.html}
+      async function loadDefault({save=true}={}){const response=await fetch(DEFAULT_URL,{cache:"no-store"});if(!response.ok)throw new Error("Could not load default app");const app={name:DEFAULT_NAME,html:await response.text(),updatedAt:Date.now()};if(save)await saveApp(app);displayApp(app)}
+      async function initialize(){try{const saved=await readSavedApp();saved&&typeof saved.html==="string"?displayApp(saved):await loadDefault()}catch(error){console.error(error);await loadDefault({save:false})}}
+      viewer.addEventListener("load",()=>setTimeout(()=>loader.classList.add("hidden"),180));
+      menuButton.addEventListener("click",()=>setMenu(true));closeButton.addEventListener("click",()=>setMenu(false));backdrop.addEventListener("click",e=>{if(e.target===backdrop)setMenu(false)});
+      reloadButton.addEventListener("click",()=>{if(!activeApp)return;setMenu(false);displayApp(activeApp);showToast("Reloaded")});
+      resetButton.addEventListener("click",async()=>{setMenu(false);try{await loadDefault();showToast("Pip’s Baccarat restored")}catch(error){console.error(error);showToast("Could not restore the default app")}});
+      fileInput.addEventListener("change",async()=>{const [file]=fileInput.files||[];fileInput.value="";if(!file)return;try{const html=await file.text();if(!validateHTML(html)){showToast("That file does not look like HTML");return}const app={name:file.name.replace(/\.html?$/i,"")||"Imported App",html,updatedAt:Date.now()};await saveApp(app);setMenu(false);displayApp(app);showToast("HTML imported")}catch(error){console.error(error);showToast("Could not open that HTML file")}});
+      if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(console.error));
+      initialize();
+    })();
+  </script>
+</body>
+</html>

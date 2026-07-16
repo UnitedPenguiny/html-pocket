@@ -1,0 +1,10 @@
+Upload to repository root:
+- index.html
+- default-app.html
+- manifest.webmanifest
+- sw.js
+- .nojekyll
+- icons/
+
+GitHub: Settings > Pages > Deploy from a branch > main > /(root)
+Then Safari on iPhone > Share > Add to Home Screen > Open as Web App > Add
