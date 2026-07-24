@@ -211,20 +211,26 @@
       flex: 0 0 auto;
     }
 
-    .header-actions {
+    /* Keeps the Insurance button level with the Mascot bubble. */
+    .mascot-top-row {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: space-between;
       gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .mascot-top-row .bubble-note {
+      margin-bottom: 0;
     }
 
     .insurance-top {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      min-height: 46px;
-      padding: 0 17px;
+      min-height: 42px;
+      padding: 0 16px;
       border: 1px solid rgba(255, 222, 168, 0.72);
       border-radius: 999px;
       color: #7a5605;
@@ -1915,6 +1921,17 @@
         padding: 8px 11px;
       }
 
+      .mascot-top-row {
+        gap: 8px;
+      }
+
+      .insurance-top {
+        min-height: 36px;
+        padding: 0 11px;
+        gap: 6px;
+        font-size: 0.7rem;
+      }
+
       .mascot-title {
         font-size: clamp(1.45rem, 6vw, 2rem);
       }
@@ -2122,16 +2139,9 @@
         <h1>Pip’s Baccarat</h1>
       </div>
 
-      <div class="header-actions">
-        <div class="top-pill" aria-label="Fair local selection">
-          <span class="top-pill-icon" id="topPillIcon" aria-hidden="true"></span>
-          50 / 50
-        </div>
-
-        <button class="insurance-top" id="insuranceButton" type="button" aria-expanded="false">
-          <span aria-hidden="true">🛟</span>
-          Insurance
-        </button>
+      <div class="top-pill" aria-label="Fair local selection">
+        <span class="top-pill-icon" id="topPillIcon" aria-hidden="true"></span>
+        50 / 50
       </div>
     </header>
 
@@ -2185,9 +2195,16 @@
         </div>
 
         <div>
-          <div class="bubble-note">
-            <span class="bubble-note-dot"></span>
-            Mascot
+          <div class="mascot-top-row">
+            <div class="bubble-note">
+              <span class="bubble-note-dot"></span>
+              Mascot
+            </div>
+
+            <button class="insurance-top" id="insuranceButton" type="button" aria-expanded="false">
+              <span aria-hidden="true">🛟</span>
+              Insurance
+            </button>
           </div>
           <h2 class="mascot-title">Pip picks.</h2>
           <p class="mascot-text">

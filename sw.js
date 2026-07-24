@@ -1,4 +1,4 @@
-const CACHE_NAME = "html-pocket-v8-insurance-top";
+const CACHE_NAME = "html-pocket-v9-insurance-mascot-row";
 const APP_SHELL = [
   "./",
   "./index.html",
