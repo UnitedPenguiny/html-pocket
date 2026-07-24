@@ -1366,9 +1366,10 @@
 
     .footer-controls {
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 14px;
+      gap: 10px;
       margin-top: 18px;
       padding: 14px;
       border: 1px solid rgba(255,255,255,0.34);
@@ -1406,6 +1407,7 @@
     .sound-toggle {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 12px;
       padding: 0 14px 0 15px;
       color: var(--night);
@@ -1427,6 +1429,233 @@
     .control-button:disabled {
       cursor: not-allowed;
       opacity: 0.45;
+    }
+
+    .control-button.insurance {
+      color: #7a5605;
+      border-color: rgba(255, 222, 168, 0.72);
+      background: linear-gradient(180deg, rgba(255,236,197,0.92), rgba(255,206,128,0.88));
+    }
+
+    .control-button.insurance:hover {
+      border-color: rgba(255, 235, 197, 0.9);
+      background: linear-gradient(180deg, rgba(255,242,214,0.96), rgba(255,214,146,0.92));
+    }
+
+    .insurance-backdrop {
+      position: fixed;
+      z-index: 60;
+      inset: 0;
+      display: grid;
+      place-items: end center;
+      padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+      background: rgba(20, 45, 84, 0.34);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 240ms ease, visibility 240ms ease;
+    }
+
+    .insurance-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .insurance-sheet {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      border: 1px solid rgba(255,255,255,0.52);
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.60);
+      box-shadow: 0 26px 70px rgba(20,48,91,0.32), inset 0 1px 0 rgba(255,255,255,0.86);
+      backdrop-filter: blur(22px) saturate(150%);
+      -webkit-backdrop-filter: blur(22px) saturate(150%);
+      transform: translateY(calc(100% + 60px));
+      transition: transform 320ms cubic-bezier(.2,.8,.2,1);
+    }
+
+    .insurance-backdrop.open .insurance-sheet {
+      transform: translateY(0);
+    }
+
+    .insurance-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .insurance-mascot {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      flex: 0 0 auto;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.66);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+
+    .insurance-mascot svg {
+      width: 34px;
+      height: 34px;
+    }
+
+    .insurance-head-text {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .insurance-title {
+      margin: 0;
+      color: var(--night);
+      font-size: 1.02rem;
+      font-weight: 880;
+    }
+
+    .insurance-subtitle {
+      margin: 2px 0 0;
+      color: var(--ink-soft);
+      font-size: 0.74rem;
+      font-weight: 700;
+    }
+
+    .insurance-close {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      flex: 0 0 auto;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      border-radius: 13px;
+      color: var(--night);
+      background: rgba(72,108,160,0.12);
+      font: inherit;
+      font-size: 1.2rem;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .insurance-field {
+      margin-bottom: 12px;
+    }
+
+    .insurance-label {
+      display: block;
+      margin: 0 0 6px 3px;
+      color: var(--ink-soft);
+      font-size: 0.68rem;
+      font-weight: 840;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .insurance-input {
+      width: 100%;
+      min-height: 50px;
+      padding: 0 14px;
+      border: 1px solid rgba(255,255,255,0.66);
+      border-radius: var(--radius-sm);
+      color: var(--night);
+      background: rgba(255,255,255,0.72);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.86);
+      font: inherit;
+      font-size: 1.02rem;
+      font-weight: 820;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+      appearance: none;
+      -moz-appearance: textfield;
+    }
+
+    .insurance-input::-webkit-outer-spin-button,
+    .insurance-input::-webkit-inner-spin-button {
+      margin: 0;
+      appearance: none;
+    }
+
+    .insurance-input::placeholder {
+      color: rgba(92, 115, 152, 0.42);
+      font-weight: 760;
+    }
+
+    .insurance-input:focus-visible {
+      border-color: var(--accent-strong);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(255, 190, 98, 0.42);
+    }
+
+    .odds-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .odds-to {
+      color: var(--ink-soft);
+      font-size: 0.82rem;
+      font-weight: 840;
+    }
+
+    .insurance-output {
+      display: grid;
+      margin-top: 16px;
+      padding: 16px 14px;
+      place-items: center;
+      border: 2px solid rgba(255, 222, 168, 0.86);
+      border-radius: var(--radius-md);
+      background: linear-gradient(180deg, rgba(255,243,219,0.86), rgba(255,219,163,0.78));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.82);
+    }
+
+    .insurance-output-label {
+      margin: 0;
+      color: #96650d;
+      font-size: 0.68rem;
+      font-weight: 840;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .insurance-output-value {
+      margin: 4px 0 0;
+      color: #6f4906;
+      font-size: 2rem;
+      font-weight: 880;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+
+    .insurance-output-note {
+      margin: 4px 0 0;
+      color: rgba(122, 86, 5, 0.76);
+      font-size: 0.72rem;
+      font-weight: 760;
+      text-align: center;
+    }
+
+    .insurance-clear {
+      width: 100%;
+      min-height: 46px;
+      margin-top: 12px;
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: var(--radius-sm);
+      color: var(--night);
+      background: rgba(255,255,255,0.42);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+      font: inherit;
+      font-size: 0.84rem;
+      font-weight: 820;
+      cursor: pointer;
+    }
+
+    .insurance-clear:active {
+      transform: scale(0.98);
     }
 
     .switch-track {
@@ -2029,6 +2258,11 @@
         Reset
       </button>
 
+      <button class="control-button insurance" id="insuranceButton" type="button">
+        <span aria-hidden="true">🛟</span>
+        Insurance
+      </button>
+
       <button
         class="sound-toggle"
         id="soundToggle"
@@ -2050,6 +2284,89 @@
 
     <div class="visually-hidden" id="announcement" aria-live="assertive"></div>
   </main>
+
+  <div class="insurance-backdrop" id="insuranceBackdrop">
+    <section
+      class="insurance-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="insuranceTitle"
+    >
+      <div class="insurance-head">
+        <div class="insurance-mascot" aria-hidden="true">
+          <svg viewBox="0 0 64 64">
+            <ellipse cx="32" cy="35" rx="17" ry="21" fill="#1d3558"/>
+            <ellipse cx="32" cy="39" rx="11" ry="14" fill="#ffffff"/>
+            <circle cx="25" cy="31" r="2.5" fill="#10203a"/>
+            <circle cx="39" cy="31" r="2.5" fill="#10203a"/>
+            <ellipse cx="22" cy="37" rx="5" ry="10" fill="#2b4876" transform="rotate(-16 22 37)"/>
+            <ellipse cx="42" cy="37" rx="5" ry="10" fill="#2b4876" transform="rotate(16 42 37)"/>
+            <path d="M32 33l6 5h-12z" fill="#ffbf87"/>
+            <ellipse cx="26" cy="53" rx="5" ry="2.6" fill="#ffbf87"/>
+            <ellipse cx="38" cy="53" rx="5" ry="2.6" fill="#ffbf87"/>
+          </svg>
+        </div>
+
+        <div class="insurance-head-text">
+          <h2 class="insurance-title" id="insuranceTitle">Insurance</h2>
+          <p class="insurance-subtitle">Pip does the math</p>
+        </div>
+
+        <button class="insurance-close" id="insuranceClose" type="button" aria-label="Close insurance calculator">×</button>
+      </div>
+
+      <div class="insurance-field">
+        <label class="insurance-label" for="insuranceAmount">Amount</label>
+        <input
+          class="insurance-input"
+          id="insuranceAmount"
+          type="number"
+          inputmode="decimal"
+          min="0"
+          step="any"
+          placeholder="1000"
+          autocomplete="off"
+        >
+      </div>
+
+      <div class="insurance-field">
+        <span class="insurance-label">Odds</span>
+        <div class="odds-row">
+          <input
+            class="insurance-input"
+            id="oddsLeft"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="any"
+            placeholder="5"
+            aria-label="Odds first number"
+            autocomplete="off"
+          >
+          <span class="odds-to">to</span>
+          <input
+            class="insurance-input"
+            id="oddsRight"
+            type="number"
+            inputmode="decimal"
+            min="0"
+            step="any"
+            placeholder="2"
+            aria-label="Odds second number"
+            autocomplete="off"
+          >
+        </div>
+      </div>
+
+      <div class="insurance-output" aria-live="polite">
+        <p class="insurance-output-label">Insurance</p>
+        <p class="insurance-output-value" id="insuranceResult">—</p>
+        <p class="insurance-output-note" id="insuranceNote">Fill in the fields above</p>
+      </div>
+
+      <button class="insurance-clear" id="insuranceClear" type="button">Clear</button>
+    </section>
+  </div>
 
   <script>
     (() => {
@@ -2141,7 +2458,16 @@
         announcement: document.getElementById("announcement"),
         topPillIcon: document.getElementById("topPillIcon"),
         buttonIcon: document.getElementById("buttonIcon"),
-        outcomePicker: document.getElementById("outcomePicker")
+        outcomePicker: document.getElementById("outcomePicker"),
+        insuranceButton: document.getElementById("insuranceButton"),
+        insuranceBackdrop: document.getElementById("insuranceBackdrop"),
+        insuranceClose: document.getElementById("insuranceClose"),
+        insuranceClear: document.getElementById("insuranceClear"),
+        insuranceAmount: document.getElementById("insuranceAmount"),
+        oddsLeft: document.getElementById("oddsLeft"),
+        oddsRight: document.getElementById("oddsRight"),
+        insuranceResult: document.getElementById("insuranceResult"),
+        insuranceNote: document.getElementById("insuranceNote")
       };
 
       const OUTCOMES = ["win", "lose", "tie"];
@@ -2423,6 +2749,60 @@
         navigator.vibrate?.(10);
       }
 
+      function readNumber(input) {
+        const value = Number.parseFloat(input.value);
+        return Number.isFinite(value) ? value : null;
+      }
+
+      function formatMoney(value) {
+        return value.toLocaleString(undefined, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2
+        });
+      }
+
+      // Odds of "5 to 2" on 1000 pays 1000 × 2 / 5 = 400.
+      function renderInsurance() {
+        const amount = readNumber(elements.insuranceAmount);
+        const left = readNumber(elements.oddsLeft);
+        const right = readNumber(elements.oddsRight);
+
+        if (amount === null || left === null || right === null) {
+          elements.insuranceResult.textContent = "—";
+          elements.insuranceNote.textContent = "Fill in the fields above";
+          return;
+        }
+
+        if (amount < 0 || left <= 0 || right < 0) {
+          elements.insuranceResult.textContent = "—";
+          elements.insuranceNote.textContent = "Use positive numbers";
+          return;
+        }
+
+        elements.insuranceResult.textContent = formatMoney((amount * right) / left);
+        elements.insuranceNote.textContent =
+          `${formatMoney(amount)} at ${formatMoney(left)} to ${formatMoney(right)}`;
+      }
+
+      function setInsuranceOpen(open) {
+        elements.insuranceBackdrop.classList.toggle("open", open);
+        elements.insuranceButton.setAttribute("aria-expanded", String(open));
+
+        if (open) {
+          window.setTimeout(() => elements.insuranceAmount.focus(), 260);
+        } else {
+          elements.insuranceButton.focus();
+        }
+      }
+
+      function clearInsurance() {
+        elements.insuranceAmount.value = "";
+        elements.oddsLeft.value = "";
+        elements.oddsRight.value = "";
+        renderInsurance();
+        elements.insuranceAmount.focus();
+      }
+
       function updateSoundToggle() {
         elements.soundToggle.setAttribute("aria-pressed", String(soundEnabled));
         elements.soundToggle.setAttribute("aria-checked", String(soundEnabled));
@@ -2448,8 +2828,34 @@
         button.addEventListener("click", () => setLatestOutcome(button.dataset.outcome));
       });
 
+      elements.insuranceButton.addEventListener("click", () => setInsuranceOpen(true));
+      elements.insuranceClose.addEventListener("click", () => setInsuranceOpen(false));
+      elements.insuranceClear.addEventListener("click", clearInsurance);
+
+      elements.insuranceBackdrop.addEventListener("click", (event) => {
+        if (event.target === elements.insuranceBackdrop) {
+          setInsuranceOpen(false);
+        }
+      });
+
+      [elements.insuranceAmount, elements.oddsLeft, elements.oddsRight].forEach((input) => {
+        input.addEventListener("input", renderInsurance);
+      });
+
       document.addEventListener("keydown", (event) => {
-        if (event.code === "Space" && !event.repeat && document.activeElement === document.body) {
+        const insuranceOpen = elements.insuranceBackdrop.classList.contains("open");
+
+        if (event.key === "Escape" && insuranceOpen) {
+          setInsuranceOpen(false);
+          return;
+        }
+
+        if (
+          event.code === "Space" &&
+          !event.repeat &&
+          !insuranceOpen &&
+          document.activeElement === document.body
+        ) {
           event.preventDefault();
           randomize();
         }
