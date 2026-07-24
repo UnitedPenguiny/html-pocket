@@ -1,4 +1,4 @@
-const CACHE_NAME = "html-pocket-v4-no-iframe";
+const CACHE_NAME = "html-pocket-v5-outcome-marks";
 const APP_SHELL = [
   "./",
   "./index.html",

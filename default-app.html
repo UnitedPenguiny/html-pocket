@@ -1257,13 +1257,88 @@
       background: linear-gradient(145deg, #ffc1cc, #ff7f96);
     }
 
+    .history-marker.win {
+      border-color: #1f9d5b;
+      box-shadow:
+        0 0 0 3px rgba(45, 190, 110, 0.92),
+        inset 0 1px 0 rgba(255,255,255,0.28),
+        0 8px 16px rgba(30, 140, 82, 0.22);
+    }
+
+    .history-marker.lose {
+      border-color: #d0344a;
+      box-shadow:
+        0 0 0 3px rgba(233, 68, 92, 0.92),
+        inset 0 1px 0 rgba(255,255,255,0.28),
+        0 8px 16px rgba(190, 50, 70, 0.22);
+    }
+
+    .history-marker.tie {
+      border-color: #d99b06;
+      box-shadow:
+        0 0 0 3px rgba(247, 187, 32, 0.95),
+        inset 0 1px 0 rgba(255,255,255,0.28),
+        0 8px 16px rgba(190, 145, 20, 0.22);
+    }
+
     .history-marker:first-child::after {
       content: "";
       position: absolute;
-      inset: -5px;
+      inset: -7px;
       border: 2px solid rgba(255,255,255,0.62);
       border-radius: 50%;
       box-shadow: 0 0 16px rgba(255,255,255,0.2);
+    }
+
+    .outcome-picker {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      width: 100%;
+      max-width: 340px;
+      margin: 4px auto 0;
+      transition: opacity 220ms ease;
+    }
+
+    .outcome-picker[hidden] {
+      display: none;
+    }
+
+    .outcome-button {
+      padding: 11px 8px;
+      border: 2px solid rgba(255,255,255,0.44);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.30);
+      color: var(--night);
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 820;
+      letter-spacing: .01em;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.42), 0 6px 14px rgba(77,122,184,0.14);
+      transition: transform 140ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .outcome-button:active {
+      transform: scale(0.96);
+    }
+
+    .outcome-button[data-outcome="win"].is-active {
+      border-color: #1f9d5b;
+      background: rgba(45, 190, 110, 0.34);
+      color: #145c36;
+    }
+
+    .outcome-button[data-outcome="lose"].is-active {
+      border-color: #d0344a;
+      background: rgba(233, 68, 92, 0.32);
+      color: #7d1c2b;
+    }
+
+    .outcome-button[data-outcome="tie"].is-active {
+      border-color: #d99b06;
+      background: rgba(247, 187, 32, 0.36);
+      color: #7a5605;
     }
 
     .empty-state {
@@ -1868,6 +1943,12 @@
           <span class="result-number" id="latestNumber">No results yet</span>
         </div>
 
+        <div class="outcome-picker" id="outcomePicker" role="group" aria-label="Mark the outcome of this pick" hidden>
+          <button class="outcome-button" type="button" data-outcome="win">Win</button>
+          <button class="outcome-button" type="button" data-outcome="lose">Lose</button>
+          <button class="outcome-button" type="button" data-outcome="tie">Tie</button>
+        </div>
+
         <button class="lucky-button single-go-button" id="randomizeButton" type="button">
           <span class="lucky-copy">
             <span class="lucky-icon-wrap" aria-hidden="true">
@@ -2056,8 +2137,12 @@
         historySub: document.getElementById("historySub"),
         announcement: document.getElementById("announcement"),
         topPillIcon: document.getElementById("topPillIcon"),
-        buttonIcon: document.getElementById("buttonIcon")
+        buttonIcon: document.getElementById("buttonIcon"),
+        outcomePicker: document.getElementById("outcomePicker")
       };
+
+      const OUTCOMES = ["win", "lose", "tie"];
+      const outcomeButtons = [...elements.outcomePicker.querySelectorAll(".outcome-button")];
 
       let history = loadHistory();
       let isAnimating = false;
@@ -2069,11 +2154,19 @@
         elements.buttonIcon.innerHTML = ICONS.shuffle;
       }
 
+      function normalizeEntry(value) {
+        // Older versions stored plain "player" / "banker" strings.
+        const side = typeof value === "string" ? value : value && value.side;
+        if (side !== "player" && side !== "banker") return null;
+        const outcome = value && OUTCOMES.includes(value.outcome) ? value.outcome : null;
+        return { side, outcome };
+      }
+
       function loadHistory() {
         try {
           const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
           if (!Array.isArray(parsed)) return [];
-          return parsed.filter((value) => value === "player" || value === "banker").slice(-MAX_STORED_RESULTS);
+          return parsed.map(normalizeEntry).filter(Boolean).slice(-MAX_STORED_RESULTS);
         } catch {
           return [];
         }
@@ -2100,10 +2193,10 @@
 
       function getStreak() {
         if (!history.length) return { side: null, count: 0 };
-        const side = history[history.length - 1];
+        const side = history[history.length - 1].side;
         let count = 1;
         for (let index = history.length - 2; index >= 0; index -= 1) {
-          if (history[index] !== side) break;
+          if (history[index].side !== side) break;
           count += 1;
         }
         return { side, count };
@@ -2117,11 +2210,15 @@
         const fragment = document.createDocumentFragment();
         const newestFirst = [...history].reverse();
 
-        newestFirst.forEach((result, index) => {
+        newestFirst.forEach((entry, index) => {
           const marker = document.createElement("span");
-          marker.className = `history-marker ${result}`;
-          marker.textContent = result === "player" ? "P" : "B";
-          marker.setAttribute("aria-label", `${history.length - index}: ${result === "player" ? "Player" : "Banker"}`);
+          const sideName = entry.side === "player" ? "Player" : "Banker";
+          marker.className = `history-marker ${entry.side}${entry.outcome ? ` ${entry.outcome}` : ""}`;
+          marker.textContent = entry.side === "player" ? "P" : "B";
+          marker.setAttribute(
+            "aria-label",
+            `${history.length - index}: ${sideName}${entry.outcome ? `, ${entry.outcome}` : ""}`
+          );
           marker.style.animationDelay = `${Math.min(index, 12) * 18}ms`;
           fragment.appendChild(marker);
         });
@@ -2131,7 +2228,7 @@
 
       function renderStats() {
         const total = history.length;
-        const playerCount = history.reduce((count, result) => count + (result === "player" ? 1 : 0), 0);
+        const playerCount = history.reduce((count, entry) => count + (entry.side === "player" ? 1 : 0), 0);
         const bankerCount = total - playerCount;
         const streak = getStreak();
 
@@ -2163,6 +2260,31 @@
         }
       }
 
+      function renderOutcomePicker() {
+        const latest = history[history.length - 1];
+        elements.outcomePicker.hidden = !latest || isAnimating;
+
+        outcomeButtons.forEach((button) => {
+          const isActive = Boolean(latest) && latest.outcome === button.dataset.outcome;
+          button.classList.toggle("is-active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+        });
+      }
+
+      function setLatestOutcome(outcome) {
+        const latest = history[history.length - 1];
+        if (!latest || isAnimating || !OUTCOMES.includes(outcome)) return;
+
+        latest.outcome = latest.outcome === outcome ? null : outcome;
+        saveHistory();
+        renderOutcomePicker();
+        renderHistory();
+        navigator.vibrate?.(8);
+        elements.announcement.textContent = latest.outcome
+          ? `Marked as ${latest.outcome}.`
+          : "Outcome cleared.";
+      }
+
       function renderLatest() {
         const latest = history[history.length - 1];
 
@@ -2173,17 +2295,19 @@
           elements.resultKicker.textContent = "Ready";
           elements.latestValue.textContent = "Tap Go!";
           elements.latestNumber.textContent = "No results yet";
+          renderOutcomePicker();
           return;
         }
 
-        const name = latest === "player" ? "Player" : "Banker";
+        const name = latest.side === "player" ? "Player" : "Banker";
 
-        elements.heroCard.dataset.result = latest;
-        elements.latestCard.dataset.result = latest;
-        setLatestIcon(latest);
+        elements.heroCard.dataset.result = latest.side;
+        elements.latestCard.dataset.result = latest.side;
+        setLatestIcon(latest.side);
         elements.resultKicker.textContent = "Result";
         elements.latestValue.textContent = name;
         elements.latestNumber.textContent = `Pick ${history.length.toLocaleString()}`;
+        renderOutcomePicker();
       }
 
       function renderAll() {
@@ -2253,11 +2377,12 @@
         elements.latestCard.dataset.result = "";
         setLatestIcon(null);
         elements.heroCard.dataset.result = "";
+        renderOutcomePicker();
 
         const result = secureCoinFlip();
 
         window.setTimeout(() => {
-          history.push(result);
+          history.push({ side: result, outcome: null });
           if (history.length > MAX_STORED_RESULTS) {
             history = history.slice(-MAX_STORED_RESULTS);
           }
@@ -2276,6 +2401,7 @@
           isAnimating = false;
           elements.randomizeButton.disabled = false;
           elements.randomizeButton.classList.remove("is-randomizing");
+          renderOutcomePicker();
         }, ANIMATION_MS);
       }
 
@@ -2308,6 +2434,10 @@
       elements.randomizeButton.addEventListener("click", randomize);
       elements.resetButton.addEventListener("click", resetHistory);
       elements.soundToggle.addEventListener("click", toggleSound);
+
+      outcomeButtons.forEach((button) => {
+        button.addEventListener("click", () => setLatestOutcome(button.dataset.outcome));
+      });
 
       document.addEventListener("keydown", (event) => {
         if (event.code === "Space" && !event.repeat && document.activeElement === document.body) {
