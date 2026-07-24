@@ -211,6 +211,44 @@
       flex: 0 0 auto;
     }
 
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .insurance-top {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 0 17px;
+      border: 1px solid rgba(255, 222, 168, 0.72);
+      border-radius: 999px;
+      color: #7a5605;
+      background: linear-gradient(180deg, rgba(255,236,197,0.94), rgba(255,206,128,0.90));
+      box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.62);
+      backdrop-filter: blur(14px) saturate(130%);
+      -webkit-backdrop-filter: blur(14px) saturate(130%);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 840;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+    }
+
+    .insurance-top:hover {
+      border-color: rgba(255, 235, 197, 0.9);
+      background: linear-gradient(180deg, rgba(255,243,217,0.97), rgba(255,214,146,0.94));
+    }
+
+    .insurance-top:active {
+      transform: scale(0.97);
+    }
+
     .glass {
       border: 1px solid var(--panel-border);
       background:
@@ -1366,10 +1404,9 @@
 
     .footer-controls {
       display: flex;
-      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 14px;
       margin-top: 18px;
       padding: 14px;
       border: 1px solid rgba(255,255,255,0.34);
@@ -1407,7 +1444,6 @@
     .sound-toggle {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       gap: 12px;
       padding: 0 14px 0 15px;
       color: var(--night);
@@ -1429,17 +1465,6 @@
     .control-button:disabled {
       cursor: not-allowed;
       opacity: 0.45;
-    }
-
-    .control-button.insurance {
-      color: #7a5605;
-      border-color: rgba(255, 222, 168, 0.72);
-      background: linear-gradient(180deg, rgba(255,236,197,0.92), rgba(255,206,128,0.88));
-    }
-
-    .control-button.insurance:hover {
-      border-color: rgba(255, 235, 197, 0.9);
-      background: linear-gradient(180deg, rgba(255,242,214,0.96), rgba(255,214,146,0.92));
     }
 
     .insurance-backdrop {
@@ -2097,9 +2122,16 @@
         <h1>Pip’s Baccarat</h1>
       </div>
 
-      <div class="top-pill" aria-label="Fair local selection">
-        <span class="top-pill-icon" id="topPillIcon" aria-hidden="true"></span>
-        50 / 50
+      <div class="header-actions">
+        <div class="top-pill" aria-label="Fair local selection">
+          <span class="top-pill-icon" id="topPillIcon" aria-hidden="true"></span>
+          50 / 50
+        </div>
+
+        <button class="insurance-top" id="insuranceButton" type="button" aria-expanded="false">
+          <span aria-hidden="true">🛟</span>
+          Insurance
+        </button>
       </div>
     </header>
 
@@ -2256,11 +2288,6 @@
       <button class="control-button" id="resetButton" type="button" disabled>
         <span aria-hidden="true">↺</span>
         Reset
-      </button>
-
-      <button class="control-button insurance" id="insuranceButton" type="button">
-        <span aria-hidden="true">🛟</span>
-        Insurance
       </button>
 
       <button

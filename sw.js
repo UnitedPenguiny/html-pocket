@@ -1,4 +1,4 @@
-const CACHE_NAME = "html-pocket-v7-insurance-calculator";
+const CACHE_NAME = "html-pocket-v8-insurance-top";
 const APP_SHELL = [
   "./",
   "./index.html",
