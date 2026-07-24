@@ -1300,8 +1300,11 @@
       transition: opacity 220ms ease;
     }
 
-    .outcome-picker[hidden] {
-      display: none;
+    /* Stays in the layout while invisible so the Go button never shifts. */
+    .outcome-picker.is-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
     }
 
     .outcome-button {
@@ -1943,7 +1946,7 @@
           <span class="result-number" id="latestNumber">No results yet</span>
         </div>
 
-        <div class="outcome-picker" id="outcomePicker" role="group" aria-label="Mark the outcome of this pick" hidden>
+        <div class="outcome-picker is-hidden" id="outcomePicker" role="group" aria-label="Mark the outcome of this pick" aria-hidden="true">
           <button class="outcome-button" type="button" data-outcome="win">Win</button>
           <button class="outcome-button" type="button" data-outcome="lose">Lose</button>
           <button class="outcome-button" type="button" data-outcome="tie">Tie</button>
@@ -2262,12 +2265,18 @@
 
       function renderOutcomePicker() {
         const latest = history[history.length - 1];
-        elements.outcomePicker.hidden = !latest || isAnimating;
+        const showPicker = Boolean(latest) && !isAnimating;
+
+        // Toggled with a class, not [hidden], so the row keeps its space in the
+        // layout and the Go button stays put.
+        elements.outcomePicker.classList.toggle("is-hidden", !showPicker);
+        elements.outcomePicker.setAttribute("aria-hidden", String(!showPicker));
 
         outcomeButtons.forEach((button) => {
           const isActive = Boolean(latest) && latest.outcome === button.dataset.outcome;
           button.classList.toggle("is-active", isActive);
           button.setAttribute("aria-pressed", String(isActive));
+          button.disabled = !showPicker;
         });
       }
 

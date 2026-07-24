@@ -1,4 +1,4 @@
-const CACHE_NAME = "html-pocket-v5-outcome-marks";
+const CACHE_NAME = "html-pocket-v6-stable-picker-space";
 const APP_SHELL = [
   "./",
   "./index.html",
